@@ -114,7 +114,8 @@ class StyleTransfer(object):
                 i += 1
                 if self.logging and (i % self.logging == 0):
                     logger(i, losses, artwork, scaler)
-                    artwork.save("/content/"+str(i)+".jpg", quality=100)
+                    art=self.postprocess(artwork)
+                    art.save("/content/"+str(i)+".jpg", quality=100)
                     print("test")
                 return total_loss
             optimizer.step(closure)
