@@ -132,6 +132,7 @@ def main():
                 print("modeling finished!!")
                 artwork.save(str(i)+"_tmp.jpg", quality=args.quality)
                 artwork.save(args.artwork, quality=args.quality)
+                print(type(artwork))
                 artwork.close()
             except Exception as e: # work on python 3.x
                 print("modeling error! Trying sliding version now!!")
