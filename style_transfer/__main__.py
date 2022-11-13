@@ -1,6 +1,7 @@
 import torch
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from PIL import Image
+from utils improt compute_shape
 from .learn import StyleTransfer
 
 def main():
