@@ -109,16 +109,29 @@ def main():
     with Image.open(args.content) as content, Image.open(args.style) as style:
         if args.pyramid:
            shapes = []
+           init_img=None
            image_shape=(content.size[0], content.size[1], 3)
            cur_shape = compute_shape(image_shape, args.max_side)
            while max(cur_shape[0], cur_shape[1]) > 224:
             shapes = [cur_shape] + shapes
             cur_shape = (cur_shape[0] // 2, cur_shape[1] // 2, cur_shape[2])
            for i, shape in enumerate(shapes):
+            if i>0:
+                init_img = Image.open(str((i-1))+".jpg")
             new_content = content.resize((shape[0], shape[1]))
             print('New image sizes:', new_content.size)
-            style = resize_image_to_vgg_input(plt.imread(args.style), int(max(shape)))
+            image_shape_stype=(content.size[0], content.size[1], 3)
+            h, w, _ = compute_shape(image_shape_stype, int(max(shape)))
+            new_style = style.resize((h, w))
+            artwork = style_transfer(new_content, new_style,
+                                 area=max(shape),
+                                 init_random=args.init_random,
+                                 init_img=init_img,
+                                 iter=args.iter)
+            #artwork.save(args.artwork, quality=args.quality)
+            artwork.save(str(i)+".jpg", quality=args.quality)
             print('New image sizes:', style.shape)
+            artwork.close()
             
         else:
             artwork = style_transfer(content, style,
@@ -126,8 +139,8 @@ def main():
                                  init_random=args.init_random,
                                  init_img=init_img,
                                  iter=args.iter)
-    artwork.save(args.artwork, quality=args.quality)
-    artwork.close()
+            artwork.save(args.artwork, quality=args.quality)
+            artwork.close()
     if init_img:
         init_img.close()
  
