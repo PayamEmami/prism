@@ -3,7 +3,7 @@ import torch
 import numpy as np
 
 import skimage.transform
-from scipy.misc import imsave
+
 
 def gram_matrix(input, feature_norm):
     b, c, h, w = input.size()
@@ -36,9 +36,6 @@ def match_color(content, style, eps=1e-5):
 
 
 
-
-def save_vgg_to_image_file(image_path, x):
-    imsave(image_path, vgg_input_to_image(x))
 
 
 mean_channel_values = np.array([103.939, 116.779, 123.68]).reshape((3, 1, 1))
