@@ -130,12 +130,15 @@ def main():
                                  init_img=init_img,
                                  iter=args.iter)
                 print("modeling finished!!")
+                artwork.save(str(i)+"_tmp.jpg", quality=args.quality)
+                artwork.save(args.artwork, quality=args.quality)
+                artwork.close()
             except Exception as e: # work on python 3.x
-                print("modeling error:"+str(e))
+                print("modeling error! Trying sliding version now!!")
             #artwork.save(args.artwork, quality=args.quality)
-            artwork.save(str(i)+"_tmp.jpg", quality=args.quality)
-            artwork.save(args.artwork, quality=args.quality)
-            artwork.close()
+            
+            
+            
             
         else:
             artwork = style_transfer(content, style,
