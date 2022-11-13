@@ -70,6 +70,15 @@ def main():
                         'If 0, no logs.'))
     parser.add_argument('--seed', metavar='<int>', default='random',
                         help='Seed for random number generators.')
+    parser.add_argument('--max-side', type=int, default=1920,
+                           help='Specify the dimension of the largest size of the generated image. The aspect ratio of '
+                                'the content image is preserved, which is how the size of the smaller dimension is '
+                                'calculated (default 1920)')
+    parser.add_argument('--pyramid', dest='pyramid', action='store_true',
+                           help='Use the pyramid algorithm (on by default)')
+    parser.add_argument('--no-pyramid', dest='pyramid', action='store_false',
+                           help='Do not use the pyramid algorithm')
+    parser.set_defaults(pyramid=False)
     args = parser.parse_args()
 
     if args.seed != 'random':
@@ -95,7 +104,16 @@ def main():
 
     init_img = Image.open(args.init_img) if args.init_img else None
     with Image.open(args.content) as content, Image.open(args.style) as style:
-        artwork = style_transfer(content, style,
+        if args.pyramid:
+           shapes = []
+            cur_shape = compute_shape(content_image.shape, args.max_side)
+            while max(cur_shape[0], cur_shape[1]) > 224:
+                shapes = [cur_shape] + shapes
+                cur_shape = (cur_shape[0] // 2, cur_shape[1] // 2, cur_shape[2])
+
+            print('Pyramid sizes:', shapes)
+        else:
+            artwork = style_transfer(content, style,
                                  area=args.area,
                                  init_random=args.init_random,
                                  init_img=init_img,
