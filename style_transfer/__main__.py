@@ -129,7 +129,7 @@ def main():
                                  init_img=init_img,
                                  iter=args.iter)
             #artwork.save(args.artwork, quality=args.quality)
-            artwork.save(str(i)+".jpg", quality=args.quality)
+            artwork.save(str(i)+"_tmp.jpg", quality=args.quality)
             
             artwork.close()
             
