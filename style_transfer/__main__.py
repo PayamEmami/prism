@@ -119,7 +119,7 @@ def main():
             if i>0:
                 init_img = Image.open(str(i-1)+"_tmp.jpg")
             new_content = content.resize((shape[0], shape[1]))
-            print('New image sizes:', new_content.size)
+            print('Modeling image size:', new_content.size)
             image_shape_stype=(content.size[0], content.size[1], 3)
             h, w, _ = compute_shape(image_shape_stype, int(max(shape)))
             new_style = style.resize((h, w))
