@@ -130,7 +130,7 @@ def main():
                                  iter=args.iter)
             #artwork.save(args.artwork, quality=args.quality)
             artwork.save(str(i)+".jpg", quality=args.quality)
-            print('New image sizes:', style.shape)
+            
             artwork.close()
             
         else:
