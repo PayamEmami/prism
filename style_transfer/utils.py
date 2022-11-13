@@ -3,7 +3,6 @@ import torch
 import numpy as np
 
 import skimage.transform
-from lasagne.utils import floatX
 from scipy.misc import imsave
 
 def gram_matrix(input, feature_norm):
@@ -76,7 +75,7 @@ def image_to_vgg_input(img):
     img = img - mean_channel_values
     # add a batch dimension for the VGG net
     img = img.reshape([1] + list(img.shape))
-    return floatX(img)
+    return float(img)
 
 
 def vgg_input_to_image(x):
@@ -115,12 +114,6 @@ def image_to_shape(image, desired_shape):
             c_diff = desired_shape[3] - image.shape[3]
             image = np.pad(image, ((0, 0), (0, 0), (r_diff // 2, r_diff - (r_diff // 2)), (c_diff // 2, c_diff - (c_diff // 2))), mode='reflect')
     return image
-
-def show_vgg_image(image):
-    plt.figure(figsize=(image.shape[3] / 80., image.shape[2] / 80.))
-    plt.axis('off')
-    plt.figimage(vgg_input_to_image(image))
-    plt.show(block=True)
 
 
 def remove_reflect_padding(image):
