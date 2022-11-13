@@ -28,3 +28,13 @@ def match_color(content, style, eps=1e-5):
     bias = mean_style - weights @ mean_content
     content_pixels = weights @ content_pixels + bias.view(3, 1)
     return content_pixels.clamp(0,1).view_as(content)
+
+def compute_shape(img_shape, max_size):
+    # initial shape is (h, w, c)
+    h, w, c = img_shape
+    if w < h:
+        # new size param is (h, w), so keep h, scale down w
+        return (max_size, int(float(w) / h * max_size), c)
+    else:
+        # new size param is (h, w), so keep w, scale down h
+        return (int(float(h) / w * max_size), max_size, c)
