@@ -1,7 +1,8 @@
 import torch
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from PIL import Image
-from .utils import compute_shape
+from .utils import compute_shape, resize_image_to_vgg_input, image_to_shape, compute_shape, \
+    image_to_vgg_input, vgg_input_to_image
 from .learn import StyleTransfer
 import matplotlib.pyplot as plt
 
