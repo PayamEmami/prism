@@ -113,7 +113,6 @@ def main():
            while max(cur_shape[0], cur_shape[1]) > 224:
             shapes = [cur_shape] + shapes
             cur_shape = (cur_shape[0] // 2, cur_shape[1] // 2, cur_shape[2])
-            new_image = image.resize((500, 500))
            for i, shape in enumerate(shapes):
             new_content = content.resize((shape[0], shape[1]))
             print('New image sizes:', new_content.size)
