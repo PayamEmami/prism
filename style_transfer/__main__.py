@@ -117,7 +117,7 @@ def main():
             cur_shape = (cur_shape[0] // 2, cur_shape[1] // 2, cur_shape[2])
            for i, shape in enumerate(shapes):
             if i>0:
-                init_img = Image.open(str((i-1))+".jpg")
+                init_img = Image.open(str(i-1)+"_tmp.jpg")
             new_content = content.resize((shape[0], shape[1]))
             print('New image sizes:', new_content.size)
             image_shape_stype=(content.size[0], content.size[1], 3)
