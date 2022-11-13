@@ -123,11 +123,15 @@ def main():
             image_shape_stype=(content.size[0], content.size[1], 3)
             h, w, _ = compute_shape(image_shape_stype, int(max(shape)))
             new_style = style.resize((h, w))
-            artwork = style_transfer(new_content, new_style,
+            try:
+                artwork = style_transfer(new_content, new_style,
                                  area=max(shape),
                                  init_random=args.init_random,
                                  init_img=init_img,
                                  iter=args.iter)
+                print("modeling finished!!")
+            except Exception as e: # work on python 3.x
+                print("modeling error:"+str(e))
             #artwork.save(args.artwork, quality=args.quality)
             artwork.save(str(i)+"_tmp.jpg", quality=args.quality)
             artwork.save(args.artwork, quality=args.quality)
