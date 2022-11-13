@@ -106,12 +106,12 @@ def main():
     with Image.open(args.content) as content, Image.open(args.style) as style:
         if args.pyramid:
            shapes = []
-            cur_shape = compute_shape(content_image.shape, args.max_side)
-            while max(cur_shape[0], cur_shape[1]) > 224:
-                shapes = [cur_shape] + shapes
-                cur_shape = (cur_shape[0] // 2, cur_shape[1] // 2, cur_shape[2])
+           cur_shape = compute_shape(content_image.shape, args.max_side)
+           while max(cur_shape[0], cur_shape[1]) > 224:
+            shapes = [cur_shape] + shapes
+            cur_shape = (cur_shape[0] // 2, cur_shape[1] // 2, cur_shape[2])
 
-            print('Pyramid sizes:', shapes)
+           print('Pyramid sizes:', shapes)
         else:
             artwork = style_transfer(content, style,
                                  area=args.area,
