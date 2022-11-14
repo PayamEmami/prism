@@ -151,6 +151,22 @@ def main():
             trf=style_transform()
             patches = preprocess(content, padding=PADDING, transform=trf, patch_size=PATCH_SIZE, cuda=False)
             patches_init = preprocess(resized_init, padding=PADDING, transform=trf, patch_size=PATCH_SIZE, cuda=False)
+            
+            style_transfer = StyleTransfer(lr=args.lr,
+                                   content_weight=args.content_weight,
+                                   style_weight=args.style_weight,
+                                   content_weights=args.content_weights,
+                                   style_weights=args.style_weights,
+                                   avg_pool=args.avg_pool,
+                                   feature_norm=args.no_feature_norm,
+                                   weights=args.weights,
+                                   preserve_color=
+                                   args.preserve_color.replace('none',''),
+                                   device=args.device,
+                                   use_amp=args.use_amp,
+                                   adam=args.use_adam,
+                                   optim_cpu=args.optim_cpu, 
+                                   logging=args.logging)
             for pch in range(patches.shape[0]):
                 image=patches[pch,:,:,:].unsqueeze(0)
                 org_shape=image.shape
@@ -170,7 +186,7 @@ def main():
                 init_image = Image.open("init_patch"+str(pch)+".jpg")
                 content_image = Image.open("content_patch"+str(pch)+".jpg")
                 artwork = style_transfer(content_image, style,
-                                 area=org_shape[2]*org_shape[3],
+                                 area=patch_size,
                                  init_random=False,
                                  init_img=init_image,
                                  iter=args.iter)
