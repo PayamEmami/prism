@@ -197,12 +197,11 @@ def main():
                     artwork = style_transfer(content_image, style,
                                      area=PATCH_SIZE,
                                      init_random=False,
-                                     init_img=init_image,
+                                     init_img=artwork,
                                      iter=args.iter)
                     artwork.save("stl_patch"+str(pch)+".jpg", quality=args.quality)
                     stylized_patch = trf(artwork).unsqueeze(0).to(args.device)
                     stylized_patch = F.interpolate(stylized_patch, org_shape[2:], mode='bilinear', align_corners=True)
-                    save_image(stylized_patch, "intrapol_patch"+str(pch)+".jpg")
                     stylized_patch = unpadding(stylized_patch, padding=PADDING)
                     stylized_patches.append(stylized_patch.cpu())
 
