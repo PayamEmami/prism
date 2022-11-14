@@ -5,6 +5,7 @@ import math
 from PIL import Image
 import torch.nn.functional as F
 import torch
+from torchvision import transforms
 
 def gram_matrix(input, feature_norm):
     b, c, h, w = input.size()
@@ -165,4 +166,22 @@ def image_process(image):
     image = image.to(torch.uint8).cpu().data.numpy()
     return image
 
-
+def style_transform(image_size=None):
+    """ Transforms for style image """
+    if image_size is not None:
+        transform = transforms.Compose(
+            [
+                transforms.Resize(image_size),
+                transforms.CenterCrop(image_size),
+                transforms.ToTensor(),
+                transforms.Normalize(mean, std),
+            ]
+        )
+    else:
+        transform = transforms.Compose(
+            [
+                transforms.ToTensor(),
+                transforms.Normalize(mean, std),
+            ]
+        )
+    return transform
