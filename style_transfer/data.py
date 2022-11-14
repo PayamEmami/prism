@@ -15,10 +15,10 @@ class Preprocess(object):
         self.device = device
         self.preserve_color = preserve_color
 
-    def __call__(self, content, size, style=None):
-        content_tensor = self._to_tensor(content, size)
+    def __call__(self, content, size, style=None,fix=False):
+        content_tensor = self._to_tensor(content, size,fix)
         if style:
-            style_tensor = self._to_tensor(style, size)
+            style_tensor = self._to_tensor(style, size,fix)
             if self.preserve_color == 'style':
                 content_tensor = match_color(content_tensor, style_tensor)
             elif self.preserve_color == 'content':
@@ -27,10 +27,12 @@ class Preprocess(object):
         content_tensor = self.normalize(content_tensor)
         return (content_tensor, style_tensor) if style else content_tensor
 
-    def _to_tensor(self, img, size):
+    def _to_tensor(self, img, size,fix=False):
         if isinstance(size, int):
             resize_factor = (size**2 / (img.size[0] * img.size[1]))**(1/2)
             size = int(min(img.size) * resize_factor)
+            if fix==True:
+              size = int(min(img.size) * 1)
         return Compose([Resize(size), ToTensor()])(img).to(self.device)
 
 class Postprocess(object):
