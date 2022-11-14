@@ -7,6 +7,9 @@ import torch.nn.functional as F
 import torch
 from torchvision import transforms
 
+mean = np.array([0.485, 0.456, 0.406])
+std = np.array([0.229, 0.224, 0.225])
+
 def gram_matrix(input, feature_norm):
     b, c, h, w = input.size()
     feature_maps = input.view(b * c, h * w)
