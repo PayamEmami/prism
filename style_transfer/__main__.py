@@ -193,7 +193,7 @@ def main():
                                  init_img=init_image,
                                  iter=args.iter)
                 artwork.save("stl_patch"+str(pch)+".jpg", quality=args.quality)
-                stylized_patch = transform(artwork).unsqueeze(0).to(device)
+                stylized_patch = trf(artwork).unsqueeze(0).to(device)
                 stylized_patch = F.interpolate(stylized_patch, org_shape[2:], mode='bilinear', align_corners=True)
                 stylized_patch = unpadding(stylized_patch, padding=PADDING)
                 stylized_patches.append(stylized_patch.cpu())
