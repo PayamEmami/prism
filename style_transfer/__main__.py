@@ -2,10 +2,11 @@ import torch
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from PIL import Image
 from .utils import compute_shape, resize_image_to_vgg_input, image_to_shape, compute_shape, \
-    image_to_vgg_input, vgg_input_to_image, preprocess
+    image_to_vgg_input, vgg_input_to_image, preprocess,style_transform
 from .learn import StyleTransfer
 import matplotlib.pyplot as plt
 from tqdm import tqdm
+
 
 def main():
     parser = ArgumentParser(description=("Creates artwork from content and "
@@ -118,6 +119,7 @@ def main():
            while max(cur_shape[0], cur_shape[1]) > 224:
             shapes = [cur_shape] + shapes
             cur_shape = (cur_shape[0] // 2, cur_shape[1] // 2, cur_shape[2])
+           do_slide=False
            for i, shape in enumerate(shapes):
             if i>0:
                 init_img = Image.open(str(i-1)+"_tmp.jpg")
@@ -138,15 +140,18 @@ def main():
                 artwork.close()
             except Exception as e: # work on python 3.x
                 print("modeling error! Trying sliding version now!!")
-                artwork = Image.open(args.artwork)
-                PATCH_SIZE = args.patch_size
-                PADDING = args.padding
-                IMAGE_WIDTH, IMAGE_HEIGHT = content.size
-                resized_init=artwork.resize((IMAGE_WIDTH,IMAGE_HEIGHT))
-                patches = preprocess(content, padding=PADDING, transform=None, patch_size=PATCH_SIZE, cuda=False)
-                print(patches)
-                print(len(patches))
-                print(type(patches[0]))
+                do_slide=True
+                
+            artwork = Image.open(args.artwork)
+            PATCH_SIZE = args.patch_size
+            PADDING = args.padding
+            IMAGE_WIDTH, IMAGE_HEIGHT = content.size
+            resized_init=artwork.resize((IMAGE_WIDTH,IMAGE_HEIGHT))
+            trf=style_transform()
+            patches = preprocess(content, padding=PADDING, transform=trf, patch_size=PATCH_SIZE, cuda=False)
+            print(patches)
+            print(len(patches))
+            print(type(patches[0]))
                       
                       
         else:
