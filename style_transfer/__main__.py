@@ -2,9 +2,10 @@ import torch
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from PIL import Image
 from .utils import compute_shape, resize_image_to_vgg_input, image_to_shape, compute_shape, \
-    image_to_vgg_input, vgg_input_to_image
+    image_to_vgg_input, vgg_input_to_image, preprocess
 from .learn import StyleTransfer
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 
 def main():
     parser = ArgumentParser(description=("Creates artwork from content and "
@@ -81,6 +82,8 @@ def main():
                            help='Use the pyramid algorithm (on by default)')
     parser.add_argument('--no-pyramid', dest='pyramid', action='store_false',
                            help='Do not use the pyramid algorithm')
+    parser.add_argument('--patch_size', type=int, default=1000, help='patch size')
+    parser.add_argument('--padding', type=int, default=32, help='padding size')
     parser.set_defaults(pyramid=False)
     args = parser.parse_args()
 
@@ -136,6 +139,13 @@ def main():
                 artwork.close()
             except Exception as e: # work on python 3.x
                 print("modeling error! Trying sliding version now!!")
+                PATCH_SIZE = args.patch_size
+                PADDING = args.padding
+                IMAGE_WIDTH, IMAGE_HEIGHT = content.size
+                resized_init=artwork.resize(IMAGE_WIDTH,IMAGE_HEIGHT)
+                patches = preprocess(image, padding=PADDING, transform=None, patch_size=PATCH_SIZE, cuda=False)
+                print(patches)
+                print(len(patches)
             #artwork.save(args.artwork, quality=args.quality)
             
             
