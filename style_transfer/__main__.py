@@ -124,7 +124,7 @@ def main():
             h, w, _ = compute_shape(image_shape_stype, int(max(shape)))
             new_style = style.resize((h, w))
             try:
-                artwork = style_transfer(new_content, new_style,
+                artwork = style_transfer(content, style,
                                  area=max(shape),
                                  init_random=args.init_random,
                                  init_img=init_img,
