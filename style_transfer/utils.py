@@ -229,3 +229,8 @@ def train_transform_v2():
         ]
     )
     return transform
+
+def unpadding(image, padding):
+    b, c, h ,w = image.shape
+    image = image[...,padding:h-padding, padding:w-padding]
+    return image
