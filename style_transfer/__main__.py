@@ -149,9 +149,13 @@ def main():
             resized_init=artwork.resize((IMAGE_WIDTH,IMAGE_HEIGHT))
             trf=style_transform()
             patches = preprocess(content, padding=PADDING, transform=trf, patch_size=PATCH_SIZE, cuda=False)
-            print(patches)
-            print(len(patches))
-            print(type(patches[0]))
+            patches_init = preprocess(resized_init, padding=PADDING, transform=trf, patch_size=PATCH_SIZE, cuda=False)
+            imagetr = torchvision.transforms.ToPILImage()(patches[0].unsqueeze(0))
+            return_image = io.BytesIO()
+            imagetr.save(return_image, "JPEG")
+            return_image.seek(0)
+            iimg=StreamingResponse(content=return_image, media_type="image/jpeg")
+            print(type(iimg))
                       
                       
         else:
