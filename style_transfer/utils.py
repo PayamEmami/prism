@@ -188,3 +188,44 @@ def style_transform(image_size=None):
             ]
         )
     return transform
+
+def denormalize(tensors):
+    """ Denormalizes image tensors using mean and std """
+    for c in range(3):
+        tensors[:, c].mul_(std[c]).add_(mean[c])
+    return tensors
+
+
+def deprocess(image_tensor):
+    """ Denormalizes and rescales image tensor """
+    image_tensor = denormalize(image_tensor)[0]
+    image_tensor *= 255
+    image_np = torch.clamp(image_tensor, 0, 255).cpu().numpy().astype(np.uint8)
+    image_np = image_np.transpose(1, 2, 0)
+    return image_np
+
+
+
+
+
+def train_transform(image_size):
+    """ Transforms for training images """
+    transform = transforms.Compose(
+        [
+            transforms.Resize(int(image_size)),
+            transforms.RandomCrop(image_size),
+            transforms.ToTensor(),
+            transforms.Normalize(mean, std),
+        ]
+    )
+    return transform
+
+def train_transform_v2():
+    """ Transforms for training images """
+    transform = transforms.Compose(
+        [
+            transforms.ToTensor(),
+            transforms.Normalize(mean, std),
+        ]
+    )
+    return transform
