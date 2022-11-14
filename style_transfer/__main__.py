@@ -197,7 +197,7 @@ def main():
                     artwork2 = style_transfer(content_image, style,
                                      area=PATCH_SIZE,
                                      init_random=False,
-                                     init_img=artwork,
+                                     init_img=init_image,
                                      iter=args.iter)
                     artwork2.save("stl_patch"+str(pch)+".jpg", quality=args.quality)
                     stylized_patch = trf(artwork2).unsqueeze(0).to(args.device)
