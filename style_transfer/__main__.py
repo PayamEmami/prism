@@ -6,6 +6,7 @@ from .utils import compute_shape, resize_image_to_vgg_input, image_to_shape, com
 from .learn import StyleTransfer
 import matplotlib.pyplot as plt
 from tqdm import tqdm
+import torchvision as torchvision
 
 
 def main():
