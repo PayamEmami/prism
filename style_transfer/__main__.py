@@ -2,7 +2,7 @@ import torch
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from PIL import Image
 from .utils import compute_shape, resize_image_to_vgg_input, image_to_shape, compute_shape, \
-    image_to_vgg_input, vgg_input_to_image, preprocess,style_transform
+    image_to_vgg_input, vgg_input_to_image, preprocess,style_transform, denormalize
 from .learn import StyleTransfer
 import matplotlib.pyplot as plt
 from tqdm import tqdm
@@ -153,7 +153,9 @@ def main():
             patches_init = preprocess(resized_init, padding=PADDING, transform=trf, patch_size=PATCH_SIZE, cuda=False)
             print(patches.shape)
             image=patches[0,:,:,:].unsqueeze(0)
+            image=denormalize(image).mul_(255.0).add_(0.5).clamp_(0, 255)
             image = image.squeeze(0).permute(1, 2, 0).to(torch.uint8)
+            
             image = image.cpu().numpy()
             image = Image.fromarray(image)
             image.save("test.jpg")
