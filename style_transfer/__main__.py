@@ -16,7 +16,7 @@ def save_image(image, save_path):
     image = image.cpu().numpy()
     image = Image.fromarray(image)
     image.save(save_path)
-    
+
 def main():
     parser = ArgumentParser(description=("Creates artwork from content and "
                             "style image."),
@@ -27,19 +27,19 @@ def main():
     parser.add_argument('--artwork', metavar='<path>',
                         default='artwork.png',
                         help='Save artwork as <path>.')
-    parser.add_argument('--init_img', metavar='<path>', 
+    parser.add_argument('--init_img', metavar='<path>',
                         help=('Initialize artwork with image at <path> '
                         'instead of content image.'))
     parser.add_argument('--init_random', action='store_true',
                         help=('Initialize artwork with random image '
                         'instead of content image.'))
-    parser.add_argument('--area', metavar='<int>', default=512, type=int, 
+    parser.add_argument('--area', metavar='<int>', default=512, type=int,
                         help=("Content and style are scaled such that their "
                         "area is <int> * <int>. Artwork has the same shape "
                         "as content."))
-    parser.add_argument('--iter', metavar='<int>', default=500, type=int, 
+    parser.add_argument('--iter', metavar='<int>', default=500, type=int,
                         help='Number of iterations.')
-    parser.add_argument('--lr', metavar='<float>', default=1, type=float, 
+    parser.add_argument('--lr', metavar='<float>', default=1, type=float,
                         help='Learning rate of the optimizer.')
     parser.add_argument('--content_weight', metavar='<int>', default=1,
                         type=int, help='Weight for content loss.')
@@ -62,7 +62,7 @@ def main():
                         "layer."))
     parser.add_argument('--preserve_color', choices=['content','style','none'],
                         default='style', help=("If 'style', change content "
-                        "to match style color. If 'content', vice versa. " 
+                        "to match style color. If 'content', vice versa. "
                         "If 'none', don't change content or style."))
     parser.add_argument('--weights', choices=['original','normalized'],
                         default='original', help=("Weights of VGG19 Network. "
@@ -115,7 +115,7 @@ def main():
                                    device=args.device,
                                    use_amp=args.use_amp,
                                    adam=args.use_adam,
-                                   optim_cpu=args.optim_cpu, 
+                                   optim_cpu=args.optim_cpu,
                                    logging=args.logging)
 
     init_img = Image.open(args.init_img) if args.init_img else None
@@ -150,71 +150,72 @@ def main():
             except Exception as e: # work on python 3.x
                 print("modeling error! Trying sliding version now!!")
                 do_slide=True
-                
-            artwork = Image.open(args.artwork)
-            PATCH_SIZE = args.patch_size
-            PADDING = args.padding
-            IMAGE_WIDTH, IMAGE_HEIGHT = content.size
-            resized_init=artwork.resize((IMAGE_WIDTH,IMAGE_HEIGHT))
-            trf=style_transform()
-            patches = preprocess(content, padding=PADDING, transform=trf, patch_size=PATCH_SIZE, cuda=False)
-            patches_init = preprocess(resized_init, padding=PADDING, transform=trf, patch_size=PATCH_SIZE, cuda=False)
-            
-            style_transfer = StyleTransfer(lr=args.lr,
-                                   content_weight=args.content_weight,
-                                   style_weight=args.style_weight,
-                                   content_weights=args.content_weights,
-                                   style_weights=args.style_weights,
-                                   avg_pool=args.avg_pool,
-                                   feature_norm=args.no_feature_norm,
-                                   weights=args.weights,
-                                   preserve_color=
-                                   args.preserve_color.replace('none',''),
-                                   device=args.device,
-                                   use_amp=args.use_amp,
-                                   adam=args.use_adam,
-                                   optim_cpu=args.optim_cpu, 
-                                   logging=args.logging)
-            stylized_patches = []
-            for pch in range(patches.shape[0]):
-                image=patches[pch,:,:,:].unsqueeze(0)
-                org_shape=image.shape
-                image=denormalize(image).mul_(255.0).add_(0.5).clamp_(0, 255)
-                image = image.squeeze(0).permute(1, 2, 0).to(torch.uint8)
-            
-                image = image.cpu().numpy()
-                image = Image.fromarray(image)
-                image.save("content_patch"+str(pch)+".jpg")
-                image=patches_init[pch,:,:,:].unsqueeze(0)
-                image=denormalize(image).mul_(255.0).add_(0.5).clamp_(0, 255)
-                image = image.squeeze(0).permute(1, 2, 0).to(torch.uint8)
-            
-                image = image.cpu().numpy()
-                image = Image.fromarray(image)
-                image.save("init_patch"+str(pch)+".jpg")
-                init_image = Image.open("init_patch"+str(pch)+".jpg")
-                content_image = Image.open("content_patch"+str(pch)+".jpg")
-                artwork = style_transfer(content_image, style,
-                                 area=PATCH_SIZE,
-                                 init_random=False,
-                                 init_img=init_image,
-                                 iter=args.iter)
-                artwork.save("stl_patch"+str(pch)+".jpg", quality=args.quality)
-                stylized_patch = trf(artwork).unsqueeze(0).to(args.device)
-                stylized_patch = F.interpolate(stylized_patch, org_shape[2:], mode='bilinear', align_corners=True)
-                stylized_patch = unpadding(stylized_patch, padding=PADDING)
-                stylized_patches.append(stylized_patch.cpu())
-                      
-            stylized_patches = torch.cat(stylized_patches, dim=0)
-            b, c, h, w = stylized_patches.shape
-            stylized_patches = stylized_patches.unsqueeze(dim=0)
-            stylized_patches = stylized_patches.view(1, b, c * h * w).permute(0, 2, 1).contiguous()
-            output_size = (int(math.sqrt(b) * h), int(math.sqrt(b) * w))
-            stylized_image = F.fold(stylized_patches, output_size=output_size,
-                            kernel_size=(h, w), stride=(h, w))
-            save_image(stylized_image, "tttt.jpg")
-            
-                      
+
+                artwork = Image.open(args.artwork)
+                PATCH_SIZE = args.patch_size
+                PADDING = args.padding
+                IMAGE_WIDTH, IMAGE_HEIGHT = content.size
+                resized_init=artwork.resize((IMAGE_WIDTH,IMAGE_HEIGHT))
+                trf=style_transform()
+                patches = preprocess(content, padding=PADDING, transform=trf, patch_size=PATCH_SIZE, cuda=False)
+                patches_init = preprocess(resized_init, padding=PADDING, transform=trf, patch_size=PATCH_SIZE, cuda=False)
+
+                style_transfer = StyleTransfer(lr=args.lr,
+                                       content_weight=args.content_weight,
+                                       style_weight=args.style_weight,
+                                       content_weights=args.content_weights,
+                                       style_weights=args.style_weights,
+                                       avg_pool=args.avg_pool,
+                                       feature_norm=args.no_feature_norm,
+                                       weights=args.weights,
+                                       preserve_color=
+                                       args.preserve_color.replace('none',''),
+                                       device=args.device,
+                                       use_amp=args.use_amp,
+                                       adam=args.use_adam,
+                                       optim_cpu=args.optim_cpu,
+                                       logging=args.logging)
+                stylized_patches = []
+                for pch in range(patches.shape[0]):
+                    image=patches[pch,:,:,:].unsqueeze(0)
+                    org_shape=image.shape
+                    image=denormalize(image).mul_(255.0).add_(0.5).clamp_(0, 255)
+                    image = image.squeeze(0).permute(1, 2, 0).to(torch.uint8)
+
+                    image = image.cpu().numpy()
+                    image = Image.fromarray(image)
+                    image.save("content_patch"+str(pch)+".jpg")
+                    image=patches_init[pch,:,:,:].unsqueeze(0)
+                    image=denormalize(image).mul_(255.0).add_(0.5).clamp_(0, 255)
+                    image = image.squeeze(0).permute(1, 2, 0).to(torch.uint8)
+
+                    image = image.cpu().numpy()
+                    image = Image.fromarray(image)
+                    image.save("init_patch"+str(pch)+".jpg")
+                    init_image = Image.open("init_patch"+str(pch)+".jpg")
+                    content_image = Image.open("content_patch"+str(pch)+".jpg")
+                    artwork = style_transfer(content_image, style,
+                                     area=PATCH_SIZE,
+                                     init_random=False,
+                                     init_img=init_image,
+                                     iter=args.iter)
+                    artwork.save("stl_patch"+str(pch)+".jpg", quality=args.quality)
+                    stylized_patch = trf(artwork).unsqueeze(0).to(args.device)
+                    stylized_patch = F.interpolate(stylized_patch, org_shape[2:], mode='bilinear', align_corners=True)
+                    stylized_patch = unpadding(stylized_patch, padding=PADDING)
+                    stylized_patches.append(stylized_patch.cpu())
+
+                stylized_patches = torch.cat(stylized_patches, dim=0)
+                b, c, h, w = stylized_patches.shape
+                stylized_patches = stylized_patches.unsqueeze(dim=0)
+                stylized_patches = stylized_patches.view(1, b, c * h * w).permute(0, 2, 1).contiguous()
+                output_size = (int(math.sqrt(b) * h), int(math.sqrt(b) * w))
+                stylized_image = F.fold(stylized_patches, output_size=output_size,
+                                kernel_size=(h, w), stride=(h, w))
+                save_image(stylized_image, args.artwork)
+                break
+
+
         else:
             artwork = style_transfer(content, style,
                                  area=args.area,
@@ -225,6 +226,6 @@ def main():
             artwork.close()
     if init_img:
         init_img.close()
- 
+
 if __name__ == '__main__':
     main()
