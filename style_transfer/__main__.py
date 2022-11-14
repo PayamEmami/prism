@@ -151,21 +151,22 @@ def main():
             trf=style_transform()
             patches = preprocess(content, padding=PADDING, transform=trf, patch_size=PATCH_SIZE, cuda=False)
             patches_init = preprocess(resized_init, padding=PADDING, transform=trf, patch_size=PATCH_SIZE, cuda=False)
-            print(patches.shape)
-            image=patches[0,:,:,:].unsqueeze(0)
-            image=denormalize(image).mul_(255.0).add_(0.5).clamp_(0, 255)
-            image = image.squeeze(0).permute(1, 2, 0).to(torch.uint8)
+            for pch in range(patches.shape[0]):
+                image=patches[pch,:,:,:].unsqueeze(0)
+                image=denormalize(image).mul_(255.0).add_(0.5).clamp_(0, 255)
+                image = image.squeeze(0).permute(1, 2, 0).to(torch.uint8)
             
-            image = image.cpu().numpy()
-            image = Image.fromarray(image)
-            image.save("test.jpg")
-            print(ttest.shape)
-            imagetr = torchvision.transforms.ToPILImage()(patches[0,:,:,:].unsqueeze(0))
-            return_image = io.BytesIO()
-            imagetr.save(return_image, "JPEG")
-            return_image.seek(0)
-            iimg=StreamingResponse(content=return_image, media_type="image/jpeg")
-            print(type(iimg))
+                image = image.cpu().numpy()
+                image = Image.fromarray(image)
+                image.save("content_patch"+str(pch)+".jpg")
+                image=patches_init[pch,:,:,:].unsqueeze(0)
+                image=denormalize(image).mul_(255.0).add_(0.5).clamp_(0, 255)
+                image = image.squeeze(0).permute(1, 2, 0).to(torch.uint8)
+            
+                image = image.cpu().numpy()
+                image = Image.fromarray(image)
+                image.save("init_patch"+str(pch)+".jpg")
+
                       
                       
         else:
