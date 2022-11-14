@@ -135,10 +135,10 @@ def main():
                 print("modeling finished!!")
                 artwork.save(str(i)+"_tmp.jpg", quality=args.quality)
                 artwork.save(args.artwork, quality=args.quality)
-                print(type(artwork))
                 artwork.close()
             except Exception as e: # work on python 3.x
                 print("modeling error! Trying sliding version now!!")
+                artwork = Image.open(args.artwork)
                 PATCH_SIZE = args.patch_size
                 PADDING = args.padding
                 IMAGE_WIDTH, IMAGE_HEIGHT = content.size
@@ -146,6 +146,7 @@ def main():
                 patches = preprocess(image, padding=PADDING, transform=None, patch_size=PATCH_SIZE, cuda=False)
                 print(patches)
                 print(len(patches))
+                print(type(patches[0]))
                       
                       
         else:
