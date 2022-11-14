@@ -151,6 +151,7 @@ def main():
             trf=style_transform()
             patches = preprocess(content, padding=PADDING, transform=trf, patch_size=PATCH_SIZE, cuda=False)
             patches_init = preprocess(resized_init, padding=PADDING, transform=trf, patch_size=PATCH_SIZE, cuda=False)
+            print(patches[0].shape)
             imagetr = torchvision.transforms.ToPILImage()(patches[0].unsqueeze(0))
             return_image = io.BytesIO()
             imagetr.save(return_image, "JPEG")
