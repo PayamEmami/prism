@@ -153,6 +153,7 @@ def main():
             patches_init = preprocess(resized_init, padding=PADDING, transform=trf, patch_size=PATCH_SIZE, cuda=False)
             for pch in range(patches.shape[0]):
                 image=patches[pch,:,:,:].unsqueeze(0)
+                org_shape=image.shape
                 image=denormalize(image).mul_(255.0).add_(0.5).clamp_(0, 255)
                 image = image.squeeze(0).permute(1, 2, 0).to(torch.uint8)
             
@@ -169,7 +170,7 @@ def main():
                 init_image = Image.open("init_patch"+str(pch)+".jpg")
                 content_image = Image.open("content_patch"+str(pch)+".jpg")
                 artwork = style_transfer(content_image, style,
-                                 area=image.shape[2]*image.shape[3],
+                                 area=org_shape[2]*org_shape[3],
                                  init_random=False,
                                  init_img=init_image,
                                  iter=args.iter)
