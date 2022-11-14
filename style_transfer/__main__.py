@@ -195,10 +195,10 @@ def main():
                     init_image = Image.open("init_patch"+str(pch)+".jpg")
                     content_image = Image.open("content_patch"+str(pch)+".jpg")
                     artwork2 = style_transfer(content_image, style,
-                                     area=(org_shape[2]*org_shape[3]),
+                                     area=512,
                                      init_random=False,
                                      init_img=init_image,
-                                     iter=args.iter)
+                                     iter=args.iter,fix=True)
                     artwork2.save("stl_patch"+str(pch)+".jpg", quality=args.quality)
                     stylized_patch = trf(artwork2).unsqueeze(0).to(args.device)
                     stylized_patch = F.interpolate(stylized_patch, org_shape[2:], mode='bilinear', align_corners=True)
