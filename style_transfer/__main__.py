@@ -2,11 +2,12 @@ import torch
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from PIL import Image
 from .utils import compute_shape, resize_image_to_vgg_input, image_to_shape, compute_shape, \
-    image_to_vgg_input, vgg_input_to_image, preprocess,style_transform, denormalize
+    image_to_vgg_input, vgg_input_to_image, preprocess,style_transform, denormalize, unpadding
 from .learn import StyleTransfer
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 import torchvision as torchvision
+import torch.nn.functional as F
 
 
 def main():
@@ -167,6 +168,7 @@ def main():
                                    adam=args.use_adam,
                                    optim_cpu=args.optim_cpu, 
                                    logging=args.logging)
+            stylized_patches = []
             for pch in range(patches.shape[0]):
                 image=patches[pch,:,:,:].unsqueeze(0)
                 org_shape=image.shape
@@ -191,8 +193,10 @@ def main():
                                  init_img=init_image,
                                  iter=args.iter)
                 artwork.save("stl_patch"+str(pch)+".jpg", quality=args.quality)
-                
-                      
+                stylized_patch = transform(artwork).unsqueeze(0).to(device)
+                stylized_patch = F.interpolate(stylized_patch, org_shape[2:], mode='bilinear', align_corners=True)
+                stylized_patch = unpadding(stylized_patch, padding=PADDING)
+                stylized_patches.append(stylized_patch.cpu())
                       
         else:
             artwork = style_transfer(content, style,
