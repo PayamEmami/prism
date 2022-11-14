@@ -195,7 +195,7 @@ def main():
                     init_image = Image.open("init_patch"+str(pch)+".jpg")
                     content_image = Image.open("content_patch"+str(pch)+".jpg")
                     artwork2 = style_transfer(content_image, style,
-                                     area=math.sqrt(org_shape[2:]),
+                                     area=math.sqrt(org_shape[2]*org_shape[3]),
                                      init_random=False,
                                      init_img=init_image,
                                      iter=args.iter)
