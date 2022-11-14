@@ -54,7 +54,7 @@ class StyleTransfer(object):
                  "1,'relu_2_1':1,'relu_3_1':1,'relu_4_1':1,'relu_5_1':1}"),
                  avg_pool=False, feature_norm=True, weights='original',
                  preserve_color='style', device='auto', use_amp=False, 
-                 adam=False, optim_cpu=False, logging=50):
+                 adam=False, optim_cpu=False, logging=50,fix=False):
         if device == 'auto':
             self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         else:
@@ -71,7 +71,7 @@ class StyleTransfer(object):
         self.logging = logging
 
     def __call__(self, content, style, area=512, init_random=False,
-                 init_img=None, iter=500):
+                 init_img=None, iter=500,fix=False):
         """Returns artwork created from content and style image.
 
         :param content: Content image.
@@ -98,7 +98,7 @@ class StyleTransfer(object):
 
         assert not (init_random and init_img)
         artwork, optimizer, scaler = self._init_call(content, style, area, 
-                                                     init_random, init_img)
+                                                     init_random, init_img,fix=fix)
         i = 0
         if self.logging:
             logger = Logger(i)
@@ -124,13 +124,13 @@ class StyleTransfer(object):
         self.criterion.reset()
         return self.postprocess(artwork)
 
-    def _init_call(self, content, style, area, init_random, init_img):
-        content_tensor, style_tensor = self.preprocess(content, area, style)
+    def _init_call(self, content, style, area, init_random, init_img,fix=False):
+        content_tensor, style_tensor = self.preprocess(content, area, style,fix=fix)
         self.criterion.set_targets(content_tensor, style_tensor)
         if init_random:
             artwork = torch.randn_like(content_tensor)
         elif init_img:
-            artwork = self.preprocess(init_img, list(content_tensor.size()[2:]))
+            artwork = self.preprocess(init_img, list(content_tensor.size()[2:]),fix=fix)
         else:
             artwork = content_tensor.clone()
         if self.optim_cpu:
