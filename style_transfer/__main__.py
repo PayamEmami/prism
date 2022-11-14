@@ -142,7 +142,7 @@ def main():
                 PATCH_SIZE = args.patch_size
                 PADDING = args.padding
                 IMAGE_WIDTH, IMAGE_HEIGHT = content.size
-                resized_init=artwork.resize(IMAGE_WIDTH,IMAGE_HEIGHT)
+                resized_init=artwork.resize((IMAGE_WIDTH,IMAGE_HEIGHT))
                 patches = preprocess(image, padding=PADDING, transform=None, patch_size=PATCH_SIZE, cuda=False)
                 print(patches)
                 print(len(patches))
