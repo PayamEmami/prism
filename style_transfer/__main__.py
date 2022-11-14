@@ -9,7 +9,13 @@ from tqdm import tqdm
 import torchvision as torchvision
 import torch.nn.functional as F
 
-
+def save_image(image, save_path):
+    image = denormalize(image).mul_(255.0).add_(0.5).clamp_(0, 255)
+    image = image.squeeze(0).permute(1, 2, 0).to(torch.uint8)
+    image = image.cpu().numpy()
+    image = Image.fromarray(image)
+    image.save(save_path)
+    
 def main():
     parser = ArgumentParser(description=("Creates artwork from content and "
                             "style image."),
@@ -197,6 +203,16 @@ def main():
                 stylized_patch = F.interpolate(stylized_patch, org_shape[2:], mode='bilinear', align_corners=True)
                 stylized_patch = unpadding(stylized_patch, padding=PADDING)
                 stylized_patches.append(stylized_patch.cpu())
+                      
+            stylized_patches = torch.cat(stylized_patches, dim=0)
+            b, c, h, w = stylized_patches.shape
+            stylized_patches = stylized_patches.unsqueeze(dim=0)
+            stylized_patches = stylized_patches.view(1, b, c * h * w).permute(0, 2, 1).contiguous()
+            output_size = (int(math.sqrt(b) * h), int(math.sqrt(b) * w))
+            stylized_image = F.fold(stylized_patches, output_size=output_size,
+                            kernel_size=(h, w), stride=(h, w))
+            save_image(stylized_image, "tttt.jpg")
+            
                       
         else:
             artwork = style_transfer(content, style,
