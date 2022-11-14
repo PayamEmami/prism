@@ -145,12 +145,9 @@ def main():
                 resized_init=artwork.resize(IMAGE_WIDTH,IMAGE_HEIGHT)
                 patches = preprocess(image, padding=PADDING, transform=None, patch_size=PATCH_SIZE, cuda=False)
                 print(patches)
-                print(len(patches)
-            #artwork.save(args.artwork, quality=args.quality)
-            
-            
-            
-            
+                print(len(patches))
+                      
+                      
         else:
             artwork = style_transfer(content, style,
                                  area=args.area,
