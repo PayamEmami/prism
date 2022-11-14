@@ -11,7 +11,7 @@ import torch.nn.functional as F
 import math
 
 def save_image(image, save_path):
-    #image = denormalize(image).mul_(255.0).add_(0.5).clamp_(0, 255)
+    image = denormalize(image).mul_(255.0).add_(0.5).clamp_(0, 255)
     image = image.squeeze(0).permute(1, 2, 0).to(torch.uint8)
     image = image.cpu().numpy()
     image = Image.fromarray(image)
