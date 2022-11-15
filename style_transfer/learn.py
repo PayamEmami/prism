@@ -61,7 +61,7 @@ class StyleTransfer(object):
             self.device = device
         self.preprocess = Preprocess(preserve_color, self.device)
         self.postprocess = Postprocess()
-        self.criterion = VGG19Loss(content_weight, style_weight,,
+        self.criterion = VGG19Loss(content_weight, style_weight,
                                    content_weights,tv_weight, style_weights, avg_pool,
                                    feature_norm, weights, self.device)
         self.lr = lr
