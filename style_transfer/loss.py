@@ -61,7 +61,7 @@ class VGG19Loss(nn.Module):
     def forward(self, input):
         self.vgg_loss(input)
         content_loss, style_loss,tv_loss = 0, 0,0
-        content_losses, style_losses,tv_losses = {}, {},{}
+        content_losses, style_losses,tv_losses = {}, {},[]
         for layer in self.content_weights:
             content_losses[layer] = self.content_losses[layer].loss
             content_loss += content_losses[layer] * self.content_weights[layer]
@@ -96,7 +96,7 @@ class VGG19Loss(nn.Module):
             loss.mode = style_mode
 
     def _build_vgg_loss(self, avg_pool, feature_norm, weights, device):
-        self.content_losses, self.style_losses,self.tv_losses = {}, {},{}
+        self.content_losses, self.style_losses,self.tv_losses = {}, {},[]
         self.vgg_loss = nn.Sequential()
         tv_mod = TVLoss(0.001)
         self.vgg_loss.add_module(str(len(self.vgg_loss)), tv_mod)
