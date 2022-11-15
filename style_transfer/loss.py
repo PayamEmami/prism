@@ -100,7 +100,7 @@ class VGG19Loss(nn.Module):
         self.vgg_loss = nn.Sequential()
         tv_mod = TVLoss(0.001)
         self.vgg_loss.add_module(str(len(self.vgg_loss)), tv_mod)
-        tv_losses.append(tv_mod)
+        self.tv_losses.append(tv_mod)
         vgg = models.vgg19().features
         if weights in ('original', 'normalized'):
             state_dict = load_state_dict_from_url('https://storage.googleapis'
