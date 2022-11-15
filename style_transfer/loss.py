@@ -98,7 +98,7 @@ class VGG19Loss(nn.Module):
     def _build_vgg_loss(self, avg_pool, feature_norm, weights, device):
         self.content_losses, self.style_losses = {}, {}
         self.vgg_loss = nn.Sequential()
-        tv_mod = TVLoss(0.001).type(dtype)
+        tv_mod = TVLoss(0.001)
         self.vgg_loss.add_module(str(len(self.vgg_loss)), tv_mod)
         tv_losses.append(tv_mod)
         vgg = models.vgg19().features
