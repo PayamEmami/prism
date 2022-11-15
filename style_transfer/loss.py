@@ -33,6 +33,18 @@ class StyleLoss(nn.Module):
             self.target = gram_matrix(input, self.feature_norm)
         return input
 
+class TVLoss(nn.Module):
+
+    def __init__(self, strength):
+        super(TVLoss, self).__init__()
+        self.strength = strength
+
+    def forward(self, input):
+        self.x_diff = input[:,:,1:,:] - input[:,:,:-1,:]
+        self.y_diff = input[:,:,:,1:] - input[:,:,:,:-1]
+        self.loss = self.strength * (torch.sum(torch.abs(self.x_diff)) + torch.sum(torch.abs(self.y_diff)))
+        return input
+
 class VGG19Loss(nn.Module):
     def __init__(self, content_weight, style_weight, content_weights,
                  style_weights, avg_pool, feature_norm, weights, device):
@@ -48,16 +60,18 @@ class VGG19Loss(nn.Module):
 
     def forward(self, input):
         self.vgg_loss(input)
-        content_loss, style_loss = 0, 0
-        content_losses, style_losses = {}, {}
+        content_loss, style_loss,tv_loss = 0, 0,0
+        content_losses, style_losses,tv_losses = {}, {},{}
         for layer in self.content_weights:
             content_losses[layer] = self.content_losses[layer].loss
             content_loss += content_losses[layer] * self.content_weights[layer]
         for layer in self.style_weights:
             style_losses[layer] = self.style_losses[layer].loss
             style_loss += style_losses[layer] * self.style_weights[layer]
+        for mod in self.tv_losses:
+            tv_loss += mod.loss.to(device)
         total_loss = content_loss * self.content_weight + \
-                     style_loss * self.style_weight
+                     style_loss * self.style_weight+tv_loss
         return (total_loss, content_loss, style_loss,
                 content_losses, style_losses)
 
@@ -84,6 +98,9 @@ class VGG19Loss(nn.Module):
     def _build_vgg_loss(self, avg_pool, feature_norm, weights, device):
         self.content_losses, self.style_losses = {}, {}
         self.vgg_loss = nn.Sequential()
+        tv_mod = TVLoss(0.001).type(dtype)
+        self.vgg_loss.add_module(str(len(self.vgg_loss)), tv_mod)
+        tv_losses.append(tv_mod)
         vgg = models.vgg19().features
         if weights in ('original', 'normalized'):
             state_dict = load_state_dict_from_url('https://storage.googleapis'
