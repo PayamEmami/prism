@@ -198,7 +198,7 @@ def main():
                                      area=512,
                                      init_random=False,
                                      init_img=init_image,
-                                     iter=args.iter,fix=True)
+                                     iter=args.iter,fix=False)
                     artwork2.save("stl_patch"+str(pch)+".jpg", quality=args.quality)
                     stylized_patch = trf(artwork2).unsqueeze(0).to(args.device)
                     stylized_patch = F.interpolate(stylized_patch, org_shape[2:], mode='bilinear', align_corners=True)
