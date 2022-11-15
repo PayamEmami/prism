@@ -45,6 +45,8 @@ def main():
                         type=int, help='Weight for content loss.')
     parser.add_argument('--style_weight', metavar='<int>', default=1000,
                         type=int, help='Weight for style loss.')
+     parser.add_argument('--tv_weight', metavar='<float>', default=0.0001,
+                        type=float, help='Weight for TV loss.')
     parser.add_argument('--content_weights', metavar='<str>',
                         default="{'relu_4_2':1}",
                         help=('Weights of content loss for each layer. '
@@ -105,6 +107,7 @@ def main():
     style_transfer = StyleTransfer(lr=args.lr,
                                    content_weight=args.content_weight,
                                    style_weight=args.style_weight,
+                                   tv_weight=args.style_weight,
                                    content_weights=args.content_weights,
                                    style_weights=args.style_weights,
                                    avg_pool=args.avg_pool,
