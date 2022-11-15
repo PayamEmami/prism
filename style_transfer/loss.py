@@ -69,7 +69,7 @@ class VGG19Loss(nn.Module):
             style_losses[layer] = self.style_losses[layer].loss
             style_loss += style_losses[layer] * self.style_weights[layer]
         for mod in self.tv_losses:
-            print mod
+            print(mod)
             tv_loss += mod.loss
         total_loss = content_loss * self.content_weight + \
                      style_loss * self.style_weight+tv_loss
