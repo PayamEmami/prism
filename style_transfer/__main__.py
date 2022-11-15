@@ -194,6 +194,7 @@ def main():
                     image.save("init_patch"+str(pch)+".jpg")
                     init_image = Image.open("init_patch"+str(pch)+".jpg")
                     content_image = Image.open("content_patch"+str(pch)+".jpg")
+                    stil_new=style.resize((org_shape[2],org_shape[3]))
                     artwork2 = style_transfer(content_image, style,
                                      area=max(org_shape),
                                      init_random=False,
