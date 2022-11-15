@@ -49,7 +49,7 @@ class StyleTransfer(object):
     :type logging: int
     """
 
-    def __init__(self, lr=1, content_weight=1, style_weight=1e3,
+    def __init__(self, lr=1, content_weight=1, style_weight=1e3,tv_weight=0.0001,
                  content_weights="{'relu_4_2':1}", style_weights=("{'relu_1_1':"
                  "1,'relu_2_1':1,'relu_3_1':1,'relu_4_1':1,'relu_5_1':1}"),
                  avg_pool=False, feature_norm=True, weights='original',
@@ -61,8 +61,8 @@ class StyleTransfer(object):
             self.device = device
         self.preprocess = Preprocess(preserve_color, self.device)
         self.postprocess = Postprocess()
-        self.criterion = VGG19Loss(content_weight, style_weight,
-                                   content_weights, style_weights, avg_pool,
+        self.criterion = VGG19Loss(content_weight, style_weight,,
+                                   content_weights,tv_weight, style_weights, avg_pool,
                                    feature_norm, weights, self.device)
         self.lr = lr
         self.use_amp = self.device == 'cuda' and use_amp
