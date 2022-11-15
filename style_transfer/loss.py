@@ -46,12 +46,12 @@ class TVLoss(nn.Module):
         return input
 
 class VGG19Loss(nn.Module):
-    def __init__(self, content_weight, style_weight, content_weights,
+    def __init__(self, content_weight, style_weight, content_weights,tv_weight
                  style_weights, avg_pool, feature_norm, weights, device):
         super(VGG19Loss, self).__init__()
         content_weights = literal_eval(content_weights)
         style_weights = literal_eval(style_weights)
-        self.content_weight, self.style_weight = content_weight, style_weight
+        self.content_weight, self.style_weight,self.tv_weight = content_weight, style_weight, tv_weight
         self.style_weights = {layer: weight / sum(style_weights.values())
                               for layer, weight in style_weights.items()}
         self.content_weights = {layer: weight / sum(content_weights.values())
@@ -69,8 +69,8 @@ class VGG19Loss(nn.Module):
             style_losses[layer] = self.style_losses[layer].loss
             style_loss += style_losses[layer] * self.style_weights[layer]
         for mod in self.tv_losses:
-            print(mod)
             tv_loss += mod.loss
+        print(tv_loss)
         total_loss = content_loss * self.content_weight + \
                      style_loss * self.style_weight+tv_loss
         return (total_loss, content_loss, style_loss,
@@ -99,7 +99,7 @@ class VGG19Loss(nn.Module):
     def _build_vgg_loss(self, avg_pool, feature_norm, weights, device):
         self.content_losses, self.style_losses,self.tv_losses = {}, {},[]
         self.vgg_loss = nn.Sequential()
-        tv_mod = TVLoss(0.001)
+        tv_mod = TVLoss(self.tv_weight)
         self.vgg_loss.add_module(str(len(self.vgg_loss)), tv_mod)
         self.tv_losses.append(tv_mod)
         vgg = models.vgg19().features
