@@ -45,7 +45,7 @@ def main():
                         type=int, help='Weight for content loss.')
     parser.add_argument('--style_weight', metavar='<int>', default=1000,
                         type=int, help='Weight for style loss.')
-     parser.add_argument('--tv_weight', metavar='<float>', default=0.0001,
+    parser.add_argument('--tv_weight', metavar='<float>', default=0.0001,
                         type=float, help='Weight for TV loss.')
     parser.add_argument('--content_weights', metavar='<str>',
                         default="{'relu_4_2':1}",
