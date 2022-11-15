@@ -46,7 +46,7 @@ class TVLoss(nn.Module):
         return input
 
 class VGG19Loss(nn.Module):
-    def __init__(self, content_weight, style_weight, content_weights,tv_weight
+    def __init__(self, content_weight, style_weight, content_weights,tv_weight,
                  style_weights, avg_pool, feature_norm, weights, device):
         super(VGG19Loss, self).__init__()
         content_weights = literal_eval(content_weights)
