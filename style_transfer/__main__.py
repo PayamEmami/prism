@@ -201,7 +201,7 @@ def main():
                     stil_new=style.resize((org_shape[2],org_shape[3]))
                     init_image.close()
                     content_image.close()
-                 for it in range(args.iter):
+                for it in range(args.iter):
                     for pch in range(patches.shape[0]):
                         content_image = Image.open("content_patch"+str(pch)+".jpg")
                         init_image = Image.open("init_patch"+str(pch)+".jpg")
