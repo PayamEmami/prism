@@ -215,7 +215,7 @@ def main():
                         #artwork2.save("content_patch"+str(pch)+".jpg", quality=100)
                         stylized_patch = trf(artwork2).unsqueeze(0).to(args.device)
                         stylized_patch = F.interpolate(stylized_patch, org_shape[2:], mode='bilinear', align_corners=True)
-                        save_image(stylized_image, "content_patch"+str(pch)+".jpg")
+                        save_image(stylized_patch, "content_patch"+str(pch)+".jpg")
                 for pch in range(patches.shape[0]):
                     content_image = Image.open("content_patch"+str(pch)+".jpg")
                     stylized_patch = trf(content_image).unsqueeze(0).to(args.device)
