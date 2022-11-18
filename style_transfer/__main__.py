@@ -199,16 +199,29 @@ def main():
                     init_image = Image.open("init_patch"+str(pch)+".jpg")
                     content_image = Image.open("content_patch"+str(pch)+".jpg")
                     stil_new=style.resize((org_shape[2],org_shape[3]))
-                    artwork2 = style_transfer(content_image, style,
-                                     area=max(org_shape),
-                                     init_random=False,
-                                     init_img=init_image,
-                                     iter=args.iter,fix=False)
-                    artwork2.save("stl_patch"+str(pch)+".jpg", quality=args.quality)
-                    stylized_patch = trf(artwork2).unsqueeze(0).to(args.device)
-                    stylized_patch = F.interpolate(stylized_patch, org_shape[2:], mode='bilinear', align_corners=True)
+                    init_image.close()
+                    content_image.close()
+                 for it in range(args.iter):
+                    for pch in range(patches.shape[0]):
+                        content_image = Image.open("content_patch"+str(pch)+".jpg")
+                        init_image = Image.open("init_patch"+str(pch)+".jpg")
+                        artwork2 = style_transfer(content_image, style,
+                                         area=max(org_shape),
+                                         init_random=False,
+                                         init_img=init_image,
+                                         iter=30,fix=False)
+                        content_image.close()
+                        init_image.close()
+                        #artwork2.save("content_patch"+str(pch)+".jpg", quality=100)
+                        stylized_patch = trf(artwork2).unsqueeze(0).to(args.device)
+                        stylized_patch = F.interpolate(stylized_patch, org_shape[2:], mode='bilinear', align_corners=True)
+                        save_image(stylized_image, "content_patch"+str(pch)+".jpg")
+                 for pch in range(patches.shape[0]):
+                    content_image = Image.open("content_patch"+str(pch)+".jpg")
+                    stylized_patch = trf(content_image).unsqueeze(0).to(args.device)
                     stylized_patch = unpadding(stylized_patch, padding=PADDING)
                     stylized_patches.append(stylized_patch.cpu())
+                    content_image.close()
 
                 stylized_patches = torch.cat(stylized_patches, dim=0)
                 b, c, h, w = stylized_patches.shape
