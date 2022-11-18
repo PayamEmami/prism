@@ -216,7 +216,7 @@ def main():
                         stylized_patch = trf(artwork2).unsqueeze(0).to(args.device)
                         stylized_patch = F.interpolate(stylized_patch, org_shape[2:], mode='bilinear', align_corners=True)
                         save_image(stylized_image, "content_patch"+str(pch)+".jpg")
-                 for pch in range(patches.shape[0]):
+                for pch in range(patches.shape[0]):
                     content_image = Image.open("content_patch"+str(pch)+".jpg")
                     stylized_patch = trf(content_image).unsqueeze(0).to(args.device)
                     stylized_patch = unpadding(stylized_patch, padding=PADDING)
