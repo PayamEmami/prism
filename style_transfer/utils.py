@@ -254,6 +254,43 @@ def make_tiles_from_canvas(canvas, tile_shape, offset=(0, 0)):
         yield canvas[tile_ix]
         
 
+def pad_image(image, pad_width):
+    return np.pad(image, pad_width, 'reflect')
+
+def pad_width_for_tiling(image_shape, tile_shape):
+    """
+    >>> pad_width_for_tiling((1, 3, 3, 4), (1, 3, 2, 2))
+    ((0, 0), (0, 0), (1, 1), (1, 1))
+    >>> pad_width_for_tiling((1, 3, 3, 4), (1, 3, 4, 4))
+    ((0, 0), (0, 0), (2, 3), (2, 2))
+    >>> pad_width_for_tiling((1, 3, 3, 5), (1, 3, 4, 4))
+    ((0, 0), (0, 0), (2, 3), (2, 3))
+    >>> pad_width_for_tiling((1, 3, 5, 5), (1, 3, 4, 4))
+    ((0, 0), (0, 0), (2, 3), (2, 3))
+    """
+    # if image_shape[2] <= tile_shape[2]:
+    #     rows_pad = (0, (tile_shape[2] - image_shape[2]))
+    # else:
+    #     rows_pad = (tile_shape[2] // 2, tile_shape[2] // 2 + (tile_shape[2] // 2 - image_shape[2]) % (tile_shape[2] // 2))
+    #
+    # if image_shape[3] <= tile_shape[3]:
+    #     cols_pad = (0, (tile_shape[3] - image_shape[3]))
+    # else:
+    #     cols_pad = (tile_shape[3] // 2, tile_shape[3] // 2 + (tile_shape[3] // 2 - image_shape[3]) % (tile_shape[3] // 2))
+    rows_pad = (tile_shape[2] // 2, tile_shape[2] // 2 + (tile_shape[2] // 2 - image_shape[2]) % (tile_shape[2] // 2))
+    cols_pad = (tile_shape[3] // 2, tile_shape[3] // 2 + (tile_shape[3] // 2 - image_shape[3]) % (tile_shape[3] // 2))
+
+    return (
+        (0, 0),
+        (0, 0),
+        rows_pad,
+        cols_pad
+    )
+
+
+def pad_image_for_tiling(image, tile_shape):
+    pad_width = pad_width_for_tiling(image.shape, tile_shape)
+    return pad_image(image, pad_width)
 
 def preprocess_overlap(image:Image, padding=32, patch_size=1024, transform=None, cuda=True, square=False):
     tile_shape = (1, 3, patch_size, patch_size)
@@ -261,6 +298,9 @@ def preprocess_overlap(image:Image, padding=32, patch_size=1024, transform=None,
         image = transform(image)
     image = image.unsqueeze(0)
     image_shape=image.shape
+    test=pad_image_for_tiling(image, tile_shape)
+    print(image.shape)
+    print(test.shape)
     for i,x in enumerate(make_tile_indexes_from_canvas(image_shape,tile_shape)):
         print(x)
     
