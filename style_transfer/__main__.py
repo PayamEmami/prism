@@ -39,6 +39,12 @@ def main():
                         "as content."))
     parser.add_argument('--iter', metavar='<int>', default=500, type=int,
                         help='Number of iterations.')
+    parser.add_argument('--iter_slide_outer', metavar='<int>', default=100, type=int,
+                        help='Number of iterations for outer loop of slides.')
+    parser.add_argument('--iter_slide_inner', metavar='<int>', default=100, type=int,
+                        help='Number of iterations for inner loop of slides.')
+    parser.add_argument('--tmp_dir', metavar='<str>', default=".", type=str,
+                        help='Location for saving temporary images')
     parser.add_argument('--lr', metavar='<float>', default=1, type=float,
                         help='Learning rate of the optimizer.')
     parser.add_argument('--content_weight', metavar='<int>', default=1,
@@ -134,7 +140,7 @@ def main():
            do_slide=False
            for i, shape in enumerate(shapes):
             if i>0:
-                init_img = Image.open(str(i-1)+"_tmp.jpg")
+                init_img = Image.open(args.tmp_dir+"/"+str(i-1)+"_tmp.jpg")
             new_content = content.resize((shape[0], shape[1]))
             print('Modeling image size:', new_content.size)
             image_shape_stype=(content.size[0], content.size[1], 3)
@@ -147,7 +153,7 @@ def main():
                                  init_img=init_img,
                                  iter=args.iter)
                 print("modeling finished!!")
-                artwork.save(str(i)+"_tmp.jpg", quality=args.quality)
+                artwork.save(args.tmp_dir+"/"+str(i)+"_tmp.jpg", quality=args.quality)
                 artwork.save(args.artwork, quality=args.quality)
                 artwork.close()
             except Exception as e: # work on python 3.x
@@ -188,36 +194,36 @@ def main():
 
                     image = image.cpu().numpy()
                     image = Image.fromarray(image)
-                    image.save("content_patch"+str(pch)+".jpg")
+                    image.save(args.tmp_dir+"/"+"content_patch"+str(pch)+".jpg")
                     image=patches_init[pch,:,:,:].unsqueeze(0)
                     image=denormalize(image).mul_(255.0).add_(0.5).clamp_(0, 255)
                     image = image.squeeze(0).permute(1, 2, 0).to(torch.uint8)
 
                     image = image.cpu().numpy()
                     image = Image.fromarray(image)
-                    image.save("init_patch"+str(pch)+".jpg")
-                    init_image = Image.open("init_patch"+str(pch)+".jpg")
-                    content_image = Image.open("content_patch"+str(pch)+".jpg")
+                    image.save(args.tmp_dir+"/"+"init_patch"+str(pch)+".jpg")
+                    init_image = Image.open(args.tmp_dir+"/"+"init_patch"+str(pch)+".jpg")
+                    content_image = Image.open(args.tmp_dir+"/"+"content_patch"+str(pch)+".jpg")
                     stil_new=style.resize((org_shape[2],org_shape[3]))
                     init_image.close()
                     content_image.close()
-                for it in range(args.iter):
+                for it in range(args.iter_slide_outer):
                     for pch in range(patches.shape[0]):
-                        content_image = Image.open("content_patch"+str(pch)+".jpg")
-                        init_image = Image.open("init_patch"+str(pch)+".jpg")
+                        content_image = Image.open(args.tmp_dir+"/"+"content_patch"+str(pch)+".jpg")
+                        init_image = Image.open(args.tmp_dir+"/"+"init_patch"+str(pch)+".jpg")
                         artwork2 = style_transfer(content_image, style,
                                          area=max(org_shape),
                                          init_random=False,
                                          init_img=init_image,
-                                         iter=30,fix=False)
+                                         iter=args.iter_slide_inner,fix=False)
                         content_image.close()
                         init_image.close()
                         #artwork2.save("content_patch"+str(pch)+".jpg", quality=100)
                         stylized_patch = trf(artwork2).unsqueeze(0).to(args.device)
                         stylized_patch = F.interpolate(stylized_patch, org_shape[2:], mode='bilinear', align_corners=True)
-                        save_image(stylized_patch, "content_patch"+str(pch)+".jpg")
+                        save_image(stylized_patch, args.tmp_dir+"/"+"content_patch"+str(pch)+".jpg")
                 for pch in range(patches.shape[0]):
-                    content_image = Image.open("content_patch"+str(pch)+".jpg")
+                    content_image = Image.open(args.tmp_dir+"/"+"content_patch"+str(pch)+".jpg")
                     stylized_patch = trf(content_image).unsqueeze(0).to(args.device)
                     stylized_patch = unpadding(stylized_patch, padding=PADDING)
                     stylized_patches.append(stylized_patch.cpu())
