@@ -103,6 +103,9 @@ def main():
     parser.add_argument('--patch_size', type=int, default=1000, help='patch size')
     parser.add_argument('--padding', type=int, default=32, help='padding size')
     parser.set_defaults(pyramid=False)
+    parser.add_argument('--overlap_slide', dest='pyramid', action='store_true',
+                           help='Use the pyramid algorithm (on by default)')
+    parser.set_defaults(overlap_slide=False)
     args = parser.parse_args()
 
     if args.seed != 'random':
@@ -166,8 +169,14 @@ def main():
                 IMAGE_WIDTH, IMAGE_HEIGHT = content.size
                 resized_init=artwork.resize((IMAGE_WIDTH,IMAGE_HEIGHT))
                 trf=style_transform()
-                patches = preprocess(content, padding=PADDING, transform=trf, patch_size=PATCH_SIZE, cuda=False)
-                patches_init = preprocess(resized_init, padding=PADDING, transform=trf, patch_size=PATCH_SIZE, cuda=False)
+                patches=[]
+                patches_init=[]
+                if args.overlap_slide==True:
+                    patches = preprocess_overlap(content, padding=PADDING, transform=trf, patch_size=PATCH_SIZE, cuda=False)
+                    patches_init = preprocess_overlap(resized_init, padding=PADDING, transform=trf, patch_size=PATCH_SIZE, cuda=False)
+                else:
+                    patches = preprocess(content, padding=PADDING, transform=trf, patch_size=PATCH_SIZE, cuda=False)
+                    patches_init = preprocess(resized_init, padding=PADDING, transform=trf, patch_size=PATCH_SIZE, cuda=False)
 
                 style_transfer = StyleTransfer(lr=args.lr,
                                        content_weight=args.content_weight,
