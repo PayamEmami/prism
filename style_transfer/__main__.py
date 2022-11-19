@@ -103,7 +103,7 @@ def main():
     parser.add_argument('--patch_size', type=int, default=1000, help='patch size')
     parser.add_argument('--padding', type=int, default=32, help='padding size')
     parser.set_defaults(pyramid=False)
-    parser.add_argument('--overlap_slide', dest='pyramid', action='store_true',
+    parser.add_argument('--overlap_slide', dest='overlap_slide', action='store_true',
                            help='Use the pyramid algorithm (on by default)')
     parser.set_defaults(overlap_slide=False)
     args = parser.parse_args()
