@@ -234,3 +234,33 @@ def unpadding(image, padding):
     b, c, h ,w = image.shape
     image = image[...,padding:h-padding, padding:w-padding]
     return image
+
+
+
+def make_tile_indexes_from_canvas(cs, tile_shape, offset=(0, 0)):
+    # loop over rows
+    cur_row = offset[0]
+    while cur_row < cs[2] - tile_shape[2] // 2:
+        # loop over columns
+        cur_col = offset[1]
+        while cur_col < cs[3] - tile_shape[3] // 2:
+            yield (slice(None, None, None), slice(None, None, None), slice(cur_row, cur_row + tile_shape[2]), slice(cur_col, cur_col + tile_shape[3]))
+            cur_col += tile_shape[3] // 2
+
+        cur_row += tile_shape[2] // 2
+        
+def make_tiles_from_canvas(canvas, tile_shape, offset=(0, 0)):
+    for tile_ix in make_tile_indexes_from_canvas(canvas.shape, tile_shape, offset):
+        yield canvas[tile_ix]
+        
+
+
+def preprocess_overlap(image:Image, padding=32, patch_size=1024, transform=None, cuda=True, square=False):
+    tile_shape = (1, 3, patch_size, patch_size)
+    if transform is not None:
+        image = transform(image)
+    image = image.unsqueeze(0)
+    image_shape=image.shape
+    for i,x in enumerate(make_tile_indexes_from_canvas(image_shape,tile_shape)):
+        print(x)
+    
