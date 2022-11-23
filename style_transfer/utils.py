@@ -292,7 +292,7 @@ def pad_image_for_tiling(image, tile_shape):
     pad_width = pad_width_for_tiling(image.shape, tile_shape)
     return pad_image(image, pad_width)
 
-def preprocess_overlap(image:Image, padding=32, patch_size=1024, transform=None, cuda=True, square=False):
+def preprocess_overlap2(image:Image, padding=32, patch_size=1024, transform=None, cuda=True, square=False):
     tile_shape = (1, 3, patch_size, patch_size)
     if transform is not None:
         image = transform(image)
@@ -309,4 +309,33 @@ def preprocess_overlap(image:Image, padding=32, patch_size=1024, transform=None,
     print(patches_out.shape)
     print(type(patches_out))
     return patches_out
+
+def preprocess_overlap(image:Image, padding=32, patch_size=1024, transform=None, cuda=True, square=False):
+    W, H = image.size
+    N = math.ceil(math.sqrt((W * H) / (patch_size ** 2)))
+    W_ = math.ceil(W / N) * N + 2 * padding
+    H_ = math.ceil(H / N) * N + 2 * padding
+    w = math.ceil(W / N) + 2 * padding
+    h = math.ceil(H / N) + 2 * padding
+    if square:
+        w = patch_size + 2 * padding
+        h = patch_size + 2 * padding
+    if transform is not None:
+        image = transform(image)
+    image = image.unsqueeze(0)
+    
+    if cuda:
+        image = image.cuda()
+    p_left = (W_ - W) // 2
+    p_right = (W_ - W) - p_left
+    p_top = (H_ - H) // 2
+    p_bottom = (H_ - H) - p_top
+    image = F.pad(image, [p_left, p_right, p_top, p_bottom], mode="reflect")
+
+    b, c, _, _ = image.shape
+    images = F.unfold(image, kernel_size=(h, w), stride=((h-2*padding)//2, (w-2*padding)//2)
+    B, C_kw_kw, L = images.shape
+    images = images.permute(0, 2, 1).contiguous()
+    images = images.view(B, L, c, h, w).squeeze(dim=0)
+    return images
     
