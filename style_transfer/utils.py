@@ -333,7 +333,7 @@ def preprocess_overlap(image:Image, padding=32, patch_size=1024, transform=None,
     image = F.pad(image, [p_left, p_right, p_top, p_bottom], mode="reflect")
 
     b, c, _, _ = image.shape
-    images = F.unfold(image, kernel_size=(h, w), stride=((h-2*padding)//2, (w-2*padding)//2)
+    images = F.unfold(image, kernel_size=(h, w), stride=((h-2*padding)//2, (w-2*padding)//2))
     B, C_kw_kw, L = images.shape
     images = images.permute(0, 2, 1).contiguous()
     images = images.view(B, L, c, h, w).squeeze(dim=0)
