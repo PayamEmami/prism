@@ -302,6 +302,11 @@ def preprocess_overlap(image:Image, padding=32, patch_size=1024, transform=None,
     print(image.shape)
     print(test.shape)
     print(pad_width_for_tiling(image.shape,tile_shape))
+    patches_out=[]
     for i,x in enumerate(make_tile_indexes_from_canvas(test.shape,tile_shape)):
+        patches_out.append(test[x])
         print(x)
+    print(patches_out.shape)
+    print(type(patches_out))
+    return patches_out
     
