@@ -292,7 +292,7 @@ def pad_image_for_tiling(image, tile_shape):
     pad_width = pad_width_for_tiling(image.shape, tile_shape)
     return pad_image(image, pad_width)
 
-def preprocess_overlap2(image:Image, padding=32, patch_size=1024, transform=None, cuda=True, square=False):
+def preprocess_overlap(image:Image, padding=32, patch_size=1024, transform=None, cuda=True, square=False):
     tile_shape = (1, 3, patch_size, patch_size)
     if transform is not None:
         image = transform(image)
@@ -307,7 +307,7 @@ def preprocess_overlap2(image:Image, padding=32, patch_size=1024, transform=None
         patches_out.append(test[x])
     return torch.stack(patches_out)
 
-def preprocess_overlap(image:Image, padding=32, patch_size=1024, transform=None, cuda=True, square=False):
+def preprocess_overlap3(image:Image, padding=32, patch_size=1024, transform=None, cuda=True, square=False):
     W, H = image.size
     N = math.ceil(math.sqrt((W * H) / (patch_size ** 2)))
     W_ = math.ceil(W / N) * N + 2 * padding
