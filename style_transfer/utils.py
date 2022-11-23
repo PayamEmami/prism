@@ -304,7 +304,10 @@ def preprocess_overlap(image:Image, padding=32, patch_size=1024, transform=None,
     print(pad_width_for_tiling(image.shape,tile_shape))
     patches_out=[]
     for i,x in enumerate(make_tile_indexes_from_canvas(test.shape,tile_shape)):
-        patches_out.append(test[x])
+        im=test[x]
+        im = transform(im)
+        im = im.unsqueeze(0)
+        patches_out.append(im)
     return torch.stack(patches_out)
 
 def preprocess_overlap3(image:Image, padding=32, patch_size=1024, transform=None, cuda=True, square=False):
